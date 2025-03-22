@@ -1,2 +1,2 @@
 # MineSweeper_Py
-Console MineSweeper With python
+Console mineSweeper with python
