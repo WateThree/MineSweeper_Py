@@ -34,6 +34,9 @@ class MineSweeperService:
     def IsGameLoss(self):
         return self.GetCurGame().gameLoss
     
+    def IsGameStart(self):
+        return not self.GetCurGame().generated
+    
     def RandomClick(self):
         self.GetCurGame().RandomClick()
         
