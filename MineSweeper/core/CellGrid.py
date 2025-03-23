@@ -5,28 +5,28 @@ class CellGrid:
     def __init__(self, width, height):
         self.width = width
         self.height = height
-        self.cells = [[Cell(x, y) for y in range(height)] for x in range(width)]
+        self.cells = [[Cell(x, y) for y in range(width)] for x in range(height)]
 
     def IsSameCell(self,cell : Cell,compareCell : Cell):
         return cell.pos == compareCell.pos
 
     def GenerateMines(self, startCell, amount):
         for _ in range(amount):
-            x = random.randint(0, self.width - 1)
-            y = random.randint(0, self.height - 1)
+            x = random.randint(0, self.height - 1)
+            y = random.randint(0, self.width - 1)
             while self.cells[x][y].cellType == CellType.Mine or self.IsSameCell(startCell,self.cells[x][y]):
-                x += 1
-                if x >= self.width:
-                    x = 0
-                    y += 1
-                    if y >= self.height:
-                        y = 0
+                y += 1
+                if y >= self.width:
+                    y = 0
+                    x += 1
+                    if x >= self.height:
+                        x = 0
             self.cells[x][y].cellType = CellType.Mine
         return
 
     def GenerateNumbers(self):
-        for x in range(self.width):
-            for y in range(self.height):
+        for x in range(self.height):
+            for y in range(self.width):
                 cell = self.cells[x][y]
                 if cell.cellType == CellType.Mine:
                     continue
@@ -53,4 +53,4 @@ class CellGrid:
             return False, None
     
     def InBounds(self, x, y):
-        return x >= 0 and x < self.width and y >= 0 and y < self.height
+        return x >= 0 and x < self.height and y >= 0 and y < self.width

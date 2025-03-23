@@ -1,4 +1,4 @@
-from core import MineSweeperService
+from MineSweeper.core import MineSweeperService
 
 def GameLoop(mineSweeperService:MineSweeperService,autoReset = True):
     print("input two number(0~n-1,split with space) to click somePlace.input R to reSetGame.input Q to Quit.")
@@ -13,10 +13,14 @@ def GameLoop(mineSweeperService:MineSweeperService,autoReset = True):
                 inputLetter = str(inputData[0])
                 if inputLetter == 'r' or inputLetter == 'R':
                     mineSweeperService.ReSetCurGame()
+
                 if inputLetter == 'q' or inputLetter == 'Q':
                     break
             except:
                 print("formatError")
+            
+            if inputLetter == 'a':
+                mineSweeperService.RandomClick()
         if len(inputData) == 2:
             try:
                 clickX = int(inputData[0])

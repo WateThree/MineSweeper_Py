@@ -1,7 +1,7 @@
 from .MineSweeperGame import MineSweeperGame
 
 class MineSweeperService:
-    def __init__(self,width = 8,height = 8,mineNum = 10):
+    def __init__(self,height = 8,width = 8,mineNum = 10):
         self.curGame = None
         self.width = width
         self.height = height
@@ -33,3 +33,7 @@ class MineSweeperService:
     
     def IsGameLoss(self):
         return self.GetCurGame().gameLoss
+    
+    def RandomClick(self):
+        self.GetCurGame().RandomClick()
+        
