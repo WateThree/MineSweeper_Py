@@ -54,8 +54,19 @@ class MineSweeperGame:
             index-=1
             if(index < 0):
                 self.TryClick(pos[0],pos[1])
-                break
-            
+                return
+
+    def RandomSafeClick(self):
+        index = random.randint(0,len(self.UnRevealedSet)-1)
+        for pos in self.UnRevealedSet:
+            index-=1
+            if(index < 0):
+                if self.cellGrid.cells[pos[0]][pos[1]].cellType == CellType.Mine:
+                    self.RandomClick()
+                    return
+                else:
+                    self.TryClick(pos[0],pos[1])
+                    return      
 
     def Click(self,x,y):
         if self.gameOver:

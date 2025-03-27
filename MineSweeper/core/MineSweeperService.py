@@ -13,7 +13,7 @@ class MineSweeperService:
         return self.curGame
     
     def ReSetCurGame(self):
-        self.curGame = MineSweeperGame()
+        self.curGame = MineSweeperGame(self.width,self.height,self.mineNum)
         return
     
     def GetCurGameDesString(self):
@@ -39,4 +39,7 @@ class MineSweeperService:
     
     def RandomClick(self):
         self.GetCurGame().RandomClick()
+
+    def RandomSafeClick(self):
+        self.GetCurGame().RandomSafeClick()
         
