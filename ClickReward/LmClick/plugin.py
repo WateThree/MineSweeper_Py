@@ -1,10 +1,8 @@
 import asyncio
 import re
 from typing import List
-
 import json
 from transformers import AutoTokenizer
-
 from swift.plugin import ORM, orms
 from swift.utils import get_logger
 from MineSweeper.core import MineSweeperService,MineSweeperGame,Cell,CellType
@@ -62,7 +60,8 @@ def calculate_string_hash(s):
     hash_obj.update(s.encode("utf-8"))
     return hash_obj.hexdigest()
 
-def CalculateRewardData(mineSweeperService:MineSweeperService,iter=1000000):
+def CalculateRewardData(mineSweeperService:MineSweeperService,iter=10000000):
+    print("Calcutating RewardDict")
     mineSweeperService = MineSweeperService(height=3,width = 3,mineNum = 3)
     rewardData = RewardData()
     for _ in range(iter):
@@ -74,7 +73,7 @@ def CalculateRewardData(mineSweeperService:MineSweeperService,iter=1000000):
             unRevealedCell = curGame.cellGrid.cells[unRevealedCellIndex[0]][unRevealedCellIndex[1]]
             unRevealedCell : Cell
             if unRevealedCell.cellType == CellType.Mine:
-                reward = -2
+                reward = 0.2
             else:
                 reward = 1
             rewardSingleData = RewardSingleData(curGame=curGame,
@@ -82,15 +81,16 @@ def CalculateRewardData(mineSweeperService:MineSweeperService,iter=1000000):
                                                 clickY=unRevealedCell.pos[1],
                                                 reward=reward)
             rewardData.AddRewardSingleData(rewardSingleData=rewardSingleData)
+    print("Calcutating Completed")
     return rewardData
 
 class MineSweeperReward(ORM): 
     def __init__(self):
         self.rewardData = RewardData()
         mineSweeperService = MineSweeperService(3,3,3)
-        self.rewardData = CalculateRewardData(mineSweeperService=mineSweeperService,iter=1000000)
-        self.responsesInValidReward = -3.0
-        self.clickIndexInValidReward = -3.0
+        self.rewardData = CalculateRewardData(mineSweeperService=mineSweeperService,iter=10000000)
+        self.responsesInValidReward = 0.0
+        self.clickIndexInValidReward = 0.1
 
     def GetRewardValue(self,gameDesAndClickString:str):
         curGameHashValue = calculate_string_hash(gameDesAndClickString)
@@ -145,20 +145,26 @@ class MineSweeperReward(ORM):
 class LengthReward(ORM): 
     def __call__(self,completions, **kwargs):
         rewardList = []
+        tokenizer = AutoTokenizer.from_pretrained("deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B")
         for completion in completions:
+            responseLen = len(tokenizer.encode(completion))
+            print(f"Len:{responseLen}")
             responsesValid, clickX, clickY = self.ResponsesValid(str(completion))
             if not responsesValid:
-                rewardList.append(-1.0)
+                #回答无效时，鼓励长度多一些
+                print(f"LenReward:{1.0*(responseLen/2048.0)}")
+                rewardList.append(1.0*(responseLen/2048.0))
                 continue
-            tokenizer = AutoTokenizer.from_pretrained("deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B")
-            responseLen = len(tokenizer.encode(completion))
+            
+            
             if responseLen < 1024:
-                rewardList.append(0.5)
+                print("LenReward:1.0")
+                rewardList.append(1.0)
                 continue
             else:
-                print(f"Len:{responseLen}")
-                print(f"LenReward:{0.5 - ((responseLen-1024.0)/1024.0)}")
-                rewardList.append(0.5 - ((responseLen-1024.0)/1024.0))
+                
+                print(f"LenReward:{1.0 - ((responseLen-1024.0)/1024.0)}")
+                rewardList.append(1.0 - ((responseLen-1024.0)/1024.0))
                 continue
         
         return rewardList

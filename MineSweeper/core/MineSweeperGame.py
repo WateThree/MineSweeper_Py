@@ -35,6 +35,7 @@ class MineSweeperGame:
                             result += str(cell.number)
                     else:
                         result += "B"
+                    result += "|"
                 result += "\n"
         return result
 
