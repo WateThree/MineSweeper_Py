@@ -89,8 +89,8 @@ class MineSweeperReward(ORM):
         self.rewardData = RewardData()
         mineSweeperService = MineSweeperService(3,3,3)
         self.rewardData = CalculateRewardData(mineSweeperService=mineSweeperService,iter=1000000)
-        self.responsesInValidReward = -1.0
-        self.clickIndexInValidReward = -1.0
+        self.responsesInValidReward = -3.0
+        self.clickIndexInValidReward = -3.0
 
     def GetRewardValue(self,gameDesAndClickString:str):
         curGameHashValue = calculate_string_hash(gameDesAndClickString)
@@ -147,19 +147,18 @@ class LengthReward(ORM):
         rewardList = []
         for completion in completions:
             responsesValid, clickX, clickY = self.ResponsesValid(str(completion))
-            print(f"responsesValid:{responsesValid},clickX:{clickX},clickY:{clickY}")
             if not responsesValid:
                 rewardList.append(-1.0)
                 continue
             tokenizer = AutoTokenizer.from_pretrained("deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B")
             responseLen = len(tokenizer.encode(completion))
             if responseLen < 1024:
-                rewardList.append(1.0)
+                rewardList.append(0.5)
                 continue
             else:
                 print(f"Len:{responseLen}")
-                print(f"LenReward:{1.0 - ((responseLen-1024.0)/1024.0)}")
-                rewardList.append(1.0 - ((responseLen-1024.0)/1024.0))
+                print(f"LenReward:{0.5 - ((responseLen-1024.0)/1024.0)}")
+                rewardList.append(0.5 - ((responseLen-1024.0)/1024.0))
                 continue
         
         return rewardList
@@ -174,9 +173,7 @@ class LengthReward(ORM):
             print(f"a = {a}, b = {b}")
             return True, a, b
         else:
-            print("没有在回答中找到正确的结构")
             return False, 0, 0
-
 
     
 class MathAccuracy(ORM):
